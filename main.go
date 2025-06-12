@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"war-game-poc/input"
 	"war-game-poc/output"
 )
 
@@ -9,6 +11,10 @@ func main() {
 	defer output.CloseWindow()
 
 	for !output.ShouldClose() {
+		keyboardInput := input.GetKeyboardInput()
+		fmt.Println(keyboardInput)
+		mouseInput := input.GetMouseInput()
+		fmt.Println(mouseInput)
 		output.DrawOutput()
 	}
 }
