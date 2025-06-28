@@ -26,6 +26,19 @@ func DrawOutput(
 		rl.Red,
 	)
 
+	const arrowLength float32 = 5
+	start := rl.Vector3{
+		X: player.PlayerPosition.X,
+		Y: player.PlayerPosition.Y,
+		Z: player.PlayerPosition.Z,
+	}
+	end := rl.Vector3{
+		X: player.PlayerPosition.X + player.HeadingUnitVector.X*arrowLength,
+		Y: player.PlayerPosition.Y + player.HeadingUnitVector.Y*arrowLength,
+		Z: player.PlayerPosition.Z + player.HeadingUnitVector.Z*arrowLength,
+	}
+	rl.DrawLine3D(start, end, rl.Red)
+
 	rl.DrawGrid(100, 1)
 	rl.EndMode3D()
 	rl.EndDrawing()

@@ -14,9 +14,9 @@ func CreatePlayer() *Player {
 		Z: 0,
 	}
 	var headingUnitVector, _ = NewUnitVector(
+		0,
 		1,
-		1,
-		1,
+		0.1,
 	)
 
 	return &Player{
