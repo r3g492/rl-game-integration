@@ -25,3 +25,22 @@ func CreatePlayer() *Player {
 		HeadingUnitVector: headingUnitVector,
 	}
 }
+
+const wheelOffset = 5.0
+
+func (p *Player) GetWheelPosition() Position {
+	forward := p.HeadingUnitVector
+	worldUp := UnitVector{X: 0, Y: 1, Z: 0}
+	right := Cross(forward, worldUp)
+	localUp := Cross(right, forward)
+	localDown := UnitVector{
+		X: -localUp.X,
+		Y: -localUp.Y,
+		Z: -localUp.Z,
+	}
+	return Position{
+		X: p.PlayerPosition.X + localDown.X*wheelOffset,
+		Y: p.PlayerPosition.Y + localDown.Y*wheelOffset,
+		Z: p.PlayerPosition.Z + localDown.Z*wheelOffset,
+	}
+}

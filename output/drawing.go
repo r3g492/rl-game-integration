@@ -26,6 +26,13 @@ func DrawOutput(
 		rl.Red,
 	)
 
+	var wheelPosition = player.GetWheelPosition()
+	rl.DrawSphere(
+		rl.Vector3{X: wheelPosition.X, Y: wheelPosition.Y, Z: wheelPosition.Z},
+		1,
+		rl.Blue,
+	)
+
 	const arrowLength float32 = 5
 	start := rl.Vector3{
 		X: player.PlayerPosition.X,
