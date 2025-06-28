@@ -1,17 +1,27 @@
 package game
 
 type Player struct {
-	Health    int32
-	PositionX float32
-	PositionY float32
-	PositionZ float32
+	Health            int32
+	PlayerPosition    Position
+	HeadingUnitVector UnitVector
 }
 
 func CreatePlayer() *Player {
+	var health int32 = 100
+	var playerPosition = Position{
+		X: 0,
+		Y: 0,
+		Z: 0,
+	}
+	var headingUnitVector, _ = NewUnitVector(
+		1,
+		1,
+		1,
+	)
+
 	return &Player{
-		Health:    100,
-		PositionX: 0.0,
-		PositionY: 0.0,
-		PositionZ: 0.0,
+		Health:            health,
+		PlayerPosition:    playerPosition,
+		HeadingUnitVector: headingUnitVector,
 	}
 }

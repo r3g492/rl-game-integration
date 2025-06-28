@@ -21,7 +21,7 @@ func DrawOutput(
 	)
 
 	rl.DrawSphere(
-		rl.Vector3{X: player.PositionX, Y: player.PositionY, Z: player.PositionZ},
+		rl.Vector3{X: player.PlayerPosition.X, Y: player.PlayerPosition.Y, Z: player.PlayerPosition.Z},
 		1,
 		rl.Red,
 	)
