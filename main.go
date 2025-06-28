@@ -11,6 +11,8 @@ func main() {
 	output.InitWindow(800, 450)
 	defer output.CloseWindow()
 
+	var player = game.CreatePlayer()
+
 	for !output.ShouldClose() {
 
 		// gather input
@@ -23,7 +25,9 @@ func main() {
 		game.UpdateGame(keyboardInput, mouseInput)
 
 		// draw output
-		output.DrawOutput()
+		output.DrawOutput(
+			player,
+		)
 
 	}
 }

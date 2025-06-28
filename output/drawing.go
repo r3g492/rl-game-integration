@@ -1,13 +1,15 @@
 package output
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	rl "github.com/gen2brain/raylib-go/raylib"
+	"war-game-poc/game"
+)
 
-func DrawOutput() {
+func DrawOutput(
+	player *game.Player,
+) {
 	rl.BeginDrawing()
-
 	rl.ClearBackground(rl.RayWhite)
-	rl.DrawText("Congrats! You created your first window!", 190, 200, 20, rl.LightGray)
-
 	rl.BeginMode3D(
 		rl.NewCamera3D(
 			rl.Vector3{X: 10, Y: 10, Z: 10},
@@ -18,6 +20,13 @@ func DrawOutput() {
 		),
 	)
 
+	rl.DrawSphere(
+		rl.Vector3{X: player.PositionX, Y: player.PositionY, Z: player.PositionZ},
+		1,
+		rl.Red,
+	)
+
 	rl.DrawGrid(100, 1)
+	rl.EndMode3D()
 	rl.EndDrawing()
 }
