@@ -22,7 +22,11 @@ func main() {
 		fmt.Println(mouseInput)
 
 		// update game
-		game.UpdateGame(keyboardInput, mouseInput)
+		game.UpdateGame(
+			keyboardInput,
+			mouseInput,
+			player,
+		)
 
 		// draw output
 		output.DrawOutput(
