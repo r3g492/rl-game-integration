@@ -9,7 +9,7 @@ func InitWindow(
 	height int32,
 ) {
 	rl.InitWindow(width, height, GameTitle)
-	rl.SetTargetFPS(1)
+	rl.SetTargetFPS(60)
 }
 
 func CloseWindow() {

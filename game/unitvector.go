@@ -16,11 +16,3 @@ func NewUnitVector(x, y, z float32) (UnitVector, error) {
 	}
 	return UnitVector{X: x / sqrt, Y: y / sqrt, Z: z / sqrt}, nil
 }
-
-func UnitVectorFromPosition(p Position) (UnitVector, error) {
-	return NewUnitVector(p.X, p.Y, p.Z)
-}
-
-func (u UnitVector) ToPosition() Position {
-	return Position{u.X, u.Y, u.Z}
-}
