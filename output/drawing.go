@@ -26,9 +26,16 @@ func DrawOutput(
 		rl.Red,
 	)
 
-	var wheelPosition = player.GetWheelPosition()
+	var wheelPosition1 = player.GetFrontWheelPosition()
 	rl.DrawSphere(
-		rl.Vector3{X: wheelPosition.X, Y: wheelPosition.Y, Z: wheelPosition.Z},
+		rl.Vector3{X: wheelPosition1.X, Y: wheelPosition1.Y, Z: wheelPosition1.Z},
+		1,
+		rl.Blue,
+	)
+
+	var wheelPosition2 = player.GetRearWheelPosition()
+	rl.DrawSphere(
+		rl.Vector3{X: wheelPosition2.X, Y: wheelPosition2.Y, Z: wheelPosition2.Z},
 		1,
 		rl.Blue,
 	)
