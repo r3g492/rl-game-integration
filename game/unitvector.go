@@ -24,3 +24,12 @@ func Cross(a, b UnitVector) UnitVector {
 		Z: a.X*b.Y - a.Y*b.X,
 	}
 }
+
+func (p *Player) Forward() UnitVector {
+	cosPitch := float32(math.Cos(float64(p.Pitch)))
+	return UnitVector{
+		X: float32(math.Sin(float64(p.Yaw))) * cosPitch,
+		Y: float32(math.Sin(float64(p.Pitch))),
+		Z: float32(math.Cos(float64(p.Yaw))) * cosPitch,
+	}
+}

@@ -1,9 +1,11 @@
 package game
 
 type Player struct {
-	Health            int32
-	PlayerPosition    Position
-	HeadingUnitVector UnitVector
+	Health         int32
+	PlayerPosition Position
+	Yaw            float32
+	Pitch          float32
+	Roll           float32
 }
 
 func CreatePlayer() *Player {
@@ -13,24 +15,21 @@ func CreatePlayer() *Player {
 		Y: 0,
 		Z: 0,
 	}
-	var headingUnitVector, _ = NewUnitVector(
-		0,
-		1,
-		0.1,
-	)
 
 	return &Player{
-		Health:            health,
-		PlayerPosition:    playerPosition,
-		HeadingUnitVector: headingUnitVector,
+		Health:         health,
+		PlayerPosition: playerPosition,
+		Yaw:            0,
+		Pitch:          0,
+		Roll:           0,
 	}
 }
 
-const wheelOffset = 5.0
+const wheelOffset = 0.3
 const floorOffset = 2.5
 
 func (p *Player) GetFrontWheelPosition() Position {
-	forward := p.HeadingUnitVector
+	forward := p.Forward()
 	worldUp := UnitVector{X: 0, Y: 1, Z: 0}
 	right := Cross(forward, worldUp)
 	localUp := Cross(right, forward)
@@ -47,7 +46,7 @@ func (p *Player) GetFrontWheelPosition() Position {
 }
 
 func (p *Player) GetRearWheelPosition() Position {
-	forward := p.HeadingUnitVector
+	forward := p.Forward()
 	worldUp := UnitVector{X: 0, Y: 1, Z: 0}
 	right := Cross(forward, worldUp)
 	localUp := Cross(right, forward)

@@ -47,9 +47,9 @@ func DrawOutput(
 		Z: player.PlayerPosition.Z,
 	}
 	end := rl.Vector3{
-		X: player.PlayerPosition.X + player.HeadingUnitVector.X*arrowLength,
-		Y: player.PlayerPosition.Y + player.HeadingUnitVector.Y*arrowLength,
-		Z: player.PlayerPosition.Z + player.HeadingUnitVector.Z*arrowLength,
+		X: player.PlayerPosition.X + player.Forward().X*arrowLength,
+		Y: player.PlayerPosition.Y + player.Forward().Y*arrowLength,
+		Z: player.PlayerPosition.Z + player.Forward().Z*arrowLength,
 	}
 	rl.DrawLine3D(start, end, rl.Red)
 
