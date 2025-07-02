@@ -12,7 +12,7 @@ func CreatePlayer() *Player {
 	var health int32 = 100
 	var playerPosition = Position{
 		X: 0,
-		Y: 0,
+		Y: 5,
 		Z: 0,
 	}
 

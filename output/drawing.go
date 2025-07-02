@@ -12,8 +12,16 @@ func DrawOutput(
 	rl.ClearBackground(rl.RayWhite)
 	rl.BeginMode3D(
 		rl.NewCamera3D(
-			rl.Vector3{X: 10, Y: 10, Z: 10},
-			rl.Vector3{X: 0, Y: 0, Z: 0},
+			rl.Vector3{
+				X: player.PlayerPosition.X - 8*player.Forward().X,
+				Y: player.PlayerPosition.Y + 8,
+				Z: player.PlayerPosition.Z - 8*player.Forward().Z,
+			},
+			rl.Vector3{
+				X: player.PlayerPosition.X + player.Forward().X,
+				Y: player.PlayerPosition.Y + player.Forward().Y,
+				Z: player.PlayerPosition.Z + player.Forward().Z,
+			},
 			rl.Vector3{X: 0, Y: 1, Z: 0},
 			90,
 			rl.CameraPerspective,
@@ -29,14 +37,14 @@ func DrawOutput(
 	var wheelPosition1 = player.GetFrontWheelPosition()
 	rl.DrawSphere(
 		rl.Vector3{X: wheelPosition1.X, Y: wheelPosition1.Y, Z: wheelPosition1.Z},
-		1,
+		0.3,
 		rl.Blue,
 	)
 
 	var wheelPosition2 = player.GetRearWheelPosition()
 	rl.DrawSphere(
 		rl.Vector3{X: wheelPosition2.X, Y: wheelPosition2.Y, Z: wheelPosition2.Z},
-		1,
+		0.3,
 		rl.Blue,
 	)
 
