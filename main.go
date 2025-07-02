@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	output.InitWindow(800, 450)
+	output.InitWindow(1600, 900)
 	defer output.CloseWindow()
 
 	var player = game.CreatePlayer()

@@ -13,9 +13,9 @@ func DrawOutput(
 	rl.BeginMode3D(
 		rl.NewCamera3D(
 			rl.Vector3{
-				X: player.PlayerPosition.X - 8*player.Forward().X,
-				Y: player.PlayerPosition.Y + 8,
-				Z: player.PlayerPosition.Z - 8*player.Forward().Z,
+				X: player.PlayerPosition.X - 12*player.Forward().X,
+				Y: player.PlayerPosition.Y + 12,
+				Z: player.PlayerPosition.Z - 12*player.Forward().Z,
 			},
 			rl.Vector3{
 				X: player.PlayerPosition.X + player.Forward().X,
