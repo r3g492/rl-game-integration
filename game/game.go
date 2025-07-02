@@ -26,6 +26,10 @@ func UpdateGame(
 		player.Yaw += 0.1
 	}
 
+	if keyboardState.Jump {
+		player.PlayerPosition.Y += 1
+	}
+
 	// way to implement gravity
 	if player.GetFrontWheelPosition().Y <= 0 {
 
