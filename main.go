@@ -33,7 +33,7 @@ func main() {
 		)
 
 	}*/
-
+	// hello
 	ort.SetSharedLibraryPath("./libonnxruntime/libonnxruntime.so")
 	err := ort.InitializeEnvironment()
 	if err != nil {
