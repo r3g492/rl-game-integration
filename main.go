@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"war-game-poc/game"
+	"war-game-poc/input"
+	"war-game-poc/output"
 )
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +58,7 @@ func main() {
 	}()
 
 	// do game part
-	/*output.InitWindow(1600, 900)
+	output.InitWindow(1600, 900)
 	defer output.CloseWindow()
 
 	var player = game.CreatePlayer()
@@ -81,7 +83,7 @@ func main() {
 			player,
 		)
 
-	}*/
+	}
 
 	ort.SetSharedLibraryPath("./libonnxruntime/libonnxruntime.so")
 	err := ort.InitializeEnvironment()
