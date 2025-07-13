@@ -6,21 +6,21 @@ import (
 )
 
 func DrawOutput(
-	player *game.Player,
+	player *game.Car,
 ) {
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.RayWhite)
 	rl.BeginMode3D(
 		rl.NewCamera3D(
 			rl.Vector3{
-				X: player.PlayerPosition.X - 12*player.Forward().X,
-				Y: player.PlayerPosition.Y + 12,
-				Z: player.PlayerPosition.Z - 12*player.Forward().Z,
+				X: player.CarPosition.X - 12*player.Forward().X,
+				Y: player.CarPosition.Y + 12,
+				Z: player.CarPosition.Z - 12*player.Forward().Z,
 			},
 			rl.Vector3{
-				X: player.PlayerPosition.X + player.Forward().X,
-				Y: player.PlayerPosition.Y + player.Forward().Y,
-				Z: player.PlayerPosition.Z + player.Forward().Z,
+				X: player.CarPosition.X + player.Forward().X,
+				Y: player.CarPosition.Y + player.Forward().Y,
+				Z: player.CarPosition.Z + player.Forward().Z,
 			},
 			rl.Vector3{X: 0, Y: 1, Z: 0},
 			90,
@@ -29,7 +29,7 @@ func DrawOutput(
 	)
 
 	rl.DrawSphere(
-		rl.Vector3{X: player.PlayerPosition.X, Y: player.PlayerPosition.Y, Z: player.PlayerPosition.Z},
+		rl.Vector3{X: player.CarPosition.X, Y: player.CarPosition.Y, Z: player.CarPosition.Z},
 		1,
 		rl.Red,
 	)
@@ -50,14 +50,14 @@ func DrawOutput(
 
 	const arrowLength float32 = 5
 	start := rl.Vector3{
-		X: player.PlayerPosition.X,
-		Y: player.PlayerPosition.Y,
-		Z: player.PlayerPosition.Z,
+		X: player.CarPosition.X,
+		Y: player.CarPosition.Y,
+		Z: player.CarPosition.Z,
 	}
 	end := rl.Vector3{
-		X: player.PlayerPosition.X + player.Forward().X*arrowLength,
-		Y: player.PlayerPosition.Y + player.Forward().Y*arrowLength,
-		Z: player.PlayerPosition.Z + player.Forward().Z*arrowLength,
+		X: player.CarPosition.X + player.Forward().X*arrowLength,
+		Y: player.CarPosition.Y + player.Forward().Y*arrowLength,
+		Z: player.CarPosition.Z + player.Forward().Z*arrowLength,
 	}
 	rl.DrawLine3D(start, end, rl.Red)
 

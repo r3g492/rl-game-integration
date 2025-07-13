@@ -16,7 +16,7 @@ func Cross(a, b UnitVector) UnitVector {
 	}
 }
 
-func (p *Player) Forward() UnitVector {
+func (p *Car) Forward() UnitVector {
 	cosPitch := float32(math.Cos(float64(p.Pitch)))
 	return UnitVector{
 		X: float32(math.Sin(float64(p.Yaw))) * cosPitch,

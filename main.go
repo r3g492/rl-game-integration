@@ -25,6 +25,7 @@ type StepResponse struct {
 func resetHandler(w http.ResponseWriter, r *http.Request) {
 	resp := map[string]int{"observation": game.GetRps()}
 	w.Header().Set("Content-Type", "application/json")
+	fmt.Println("reset ")
 	json.NewEncoder(w).Encode(resp)
 }
 
@@ -41,14 +42,25 @@ func stepHandler(w http.ResponseWriter, r *http.Request) {
 		Done:        true,
 	}
 	w.Header().Set("Content-Type", "application/json")
+	fmt.Println("step ", req.Action)
 	json.NewEncoder(w).Encode(resp)
 }
+
+func testHandler(w http.ResponseWriter, r *http.Request) {
+	moveSpeed := float32(0.2)
+	playerCar.CarPosition.X += playerCar.Forward().X * moveSpeed
+	playerCar.CarPosition.Y += playerCar.Forward().Y * moveSpeed
+	playerCar.CarPosition.Z += playerCar.Forward().Z * moveSpeed
+}
+
+var playerCar *game.Car
 
 func main() {
 	// init http part
 	http.HandleFunc("/health", healthHandler)
 	http.HandleFunc("/reset", resetHandler)
 	http.HandleFunc("/step", stepHandler)
+	http.HandleFunc("/test", testHandler)
 	fmt.Println("Server running on http://localhost:8080")
 	go func() {
 		fmt.Println("Server running on http://localhost:8080")
@@ -61,30 +73,28 @@ func main() {
 	output.InitWindow(1600, 900)
 	defer output.CloseWindow()
 
-	var player = game.CreatePlayer()
+	playerCar = game.CreateCar()
 
 	for !output.ShouldClose() {
 
 		// gather input
 		keyboardInput := input.GetKeyboardInput()
-		mouseInput := input.GetMouseInput()
-		// fmt.Println(keyboardInput)
-		// fmt.Println(mouseInput)
+		_ = input.GetMouseInput()
 
 		// update game
 		game.UpdateGame(
 			keyboardInput,
-			mouseInput,
-			player,
+			playerCar,
 		)
 
 		// draw output
 		output.DrawOutput(
-			player,
+			playerCar,
 		)
 
 	}
 
+	// below code is for RPS. does not do anything at the moment.
 	ort.SetSharedLibraryPath("./libonnxruntime/libonnxruntime.so")
 	err := ort.InitializeEnvironment()
 	if err != nil {

@@ -34,20 +34,19 @@ func Duel(input int) int {
 
 func UpdateGame(
 	keyboardState input.KeyboardState,
-	mouseState input.MouseState,
-	player *Player,
+	player *Car,
 ) {
 	forward := player.Forward()
 	moveSpeed := float32(0.2)
 	if keyboardState.MoveFront {
-		player.PlayerPosition.X += forward.X * moveSpeed
-		player.PlayerPosition.Y += forward.Y * moveSpeed
-		player.PlayerPosition.Z += forward.Z * moveSpeed
+		player.CarPosition.X += forward.X * moveSpeed
+		player.CarPosition.Y += forward.Y * moveSpeed
+		player.CarPosition.Z += forward.Z * moveSpeed
 	}
 	if keyboardState.MoveBack {
-		player.PlayerPosition.X -= forward.X * moveSpeed
-		player.PlayerPosition.Y -= forward.Y * moveSpeed
-		player.PlayerPosition.Z -= forward.Z * moveSpeed
+		player.CarPosition.X -= forward.X * moveSpeed
+		player.CarPosition.Y -= forward.Y * moveSpeed
+		player.CarPosition.Z -= forward.Z * moveSpeed
 	}
 	if keyboardState.MoveRight {
 		player.Yaw -= 0.1
@@ -57,7 +56,7 @@ func UpdateGame(
 	}
 
 	if keyboardState.Jump {
-		player.PlayerPosition.Y += 1
+		player.CarPosition.Y += 1
 	}
 
 	// way to implement gravity
@@ -69,7 +68,7 @@ func UpdateGame(
 
 	}
 
-	if player.PlayerPosition.Y > 0 {
-		player.PlayerPosition.Y -= 0.1
+	if player.CarPosition.Y > 0 {
+		player.CarPosition.Y -= 0.1
 	}
 }
