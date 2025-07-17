@@ -5,23 +5,22 @@ import (
 	"war-game-poc/game"
 )
 
-func DrawOutput(
-	player *game.Car,
-	aiCar *game.Car,
+func DrawGame(
+	g *game.Game,
 ) {
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.RayWhite)
 	rl.BeginMode3D(
 		rl.NewCamera3D(
 			rl.Vector3{
-				X: player.CarPosition.X - 12*player.Forward().X,
-				Y: player.CarPosition.Y + 12,
-				Z: player.CarPosition.Z - 12*player.Forward().Z,
+				X: g.PlayerCar.CarPosition.X - 12*g.PlayerCar.Forward().X,
+				Y: g.PlayerCar.CarPosition.Y + 12,
+				Z: g.PlayerCar.CarPosition.Z - 12*g.PlayerCar.Forward().Z,
 			},
 			rl.Vector3{
-				X: player.CarPosition.X + player.Forward().X,
-				Y: player.CarPosition.Y + player.Forward().Y,
-				Z: player.CarPosition.Z + player.Forward().Z,
+				X: g.PlayerCar.CarPosition.X + g.PlayerCar.Forward().X,
+				Y: g.PlayerCar.CarPosition.Y + g.PlayerCar.Forward().Y,
+				Z: g.PlayerCar.CarPosition.Z + g.PlayerCar.Forward().Z,
 			},
 			rl.Vector3{X: 0, Y: 1, Z: 0},
 			90,
@@ -29,8 +28,14 @@ func DrawOutput(
 		),
 	)
 
-	drawCar(player)
-	drawCar(aiCar)
+	drawCar(g.PlayerCar)
+	drawCar(g.AiCar)
+
+	rl.DrawSphere(
+		rl.Vector3{X: g.Goal.X, Y: g.Goal.Y, Z: g.Goal.Z},
+		1,
+		rl.Blue,
+	)
 
 	rl.DrawGrid(100, 1)
 	rl.EndMode3D()

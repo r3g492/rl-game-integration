@@ -26,7 +26,7 @@ func resetHandler(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
-	resp := map[string]int{"observation": game.GetRps()}
+	resp := map[string]int{"observation": 5}
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Println("reset ")
 	json.NewEncoder(w).Encode(resp)
@@ -41,10 +41,9 @@ func stepHandler(
 		Action int `json:"action"`
 	}
 	json.NewDecoder(r.Body).Decode(&req)
-	reward := game.Duel(req.Action)
 	resp := StepResponse{
-		Observation: game.GetRps(),
-		Reward:      reward,
+		Observation: 2,
+		Reward:      1,
 		Done:        true,
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -78,16 +77,15 @@ func main() {
 		_ = input.GetMouseInput()
 
 		// update game
-		playerCar := g.UpdatePlayer(
-			keyboardInput,
-		)
-		aiCar := g.UpdateAi()
+		g.UpdatePlayer(keyboardInput)
+		g.UpdateAi()
+
+		if g.CheckGoalIn() {
+			g.Reset()
+		}
 
 		// draw output
-		output.DrawOutput(
-			playerCar,
-			aiCar,
-		)
+		output.DrawGame(g)
 	}
 
 	// below code is for RPS. does not do anything at the moment.
