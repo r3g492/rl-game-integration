@@ -24,7 +24,14 @@ func Duel(input int) int {
 	return 5
 }
 
-func (g *Game) Update(keyboardState input.KeyboardState) (*Car, *Car) {
+func (g *Game) UpdateAi() *Car {
+
+	g.AiCar.ApplyGravity()
+
+	return g.AiCar
+}
+
+func (g *Game) UpdatePlayer(keyboardState input.KeyboardState) *Car {
 	forward := g.PlayerCar.Forward()
 
 	if keyboardState.MoveFront {
@@ -47,9 +54,8 @@ func (g *Game) Update(keyboardState input.KeyboardState) (*Car, *Car) {
 	}
 
 	g.PlayerCar.ApplyGravity()
-	g.AiCar.ApplyGravity()
 
-	return g.PlayerCar, g.AiCar
+	return g.PlayerCar
 }
 
 func (c *Car) ApplyGravity() {

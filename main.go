@@ -78,9 +78,10 @@ func main() {
 		_ = input.GetMouseInput()
 
 		// update game
-		playerCar, aiCar := g.Update(
+		playerCar := g.UpdatePlayer(
 			keyboardInput,
 		)
+		aiCar := g.UpdateAi()
 
 		// draw output
 		output.DrawOutput(
