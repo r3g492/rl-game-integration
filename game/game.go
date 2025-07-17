@@ -1,102 +1,79 @@
 package game
 
 import (
-	"math/rand"
 	"war-game-poc/input"
 )
 
-type State struct {
-	Rps int // 0: Rock 1: paper 2: scissor
+const (
+	moveSpeed  = float32(0.2)
+	turnSpeed  = 0.1
+	gravity    = 0.1
+	jumpHeight = 1.0
+)
+
+type Game struct {
+	PlayerCar *Car
+	AiCar     *Car
 }
 
-var gameState State
-var PlayerCar *Car
-var AiCar *Car
-
 func GetRps() int {
-	return gameState.Rps
+	return 0
 }
 
 func Duel(input int) int {
-	opponent := gameState.Rps
-	var reward = 0
-	// 0: Rock, 1: Paper, 2: Scissors
-	if input == opponent {
-		reward = 0
-	} else if (input == 0 && opponent == 2) || // Rock beats Scissors
-		(input == 1 && opponent == 0) || // Paper beats Rock
-		(input == 2 && opponent == 1) { // Scissors beats Paper
-		reward = 1
-	} else {
-		reward = -1
-	}
-	gameState.Rps = rand.Intn(3)
-	return reward
+	return 5
 }
 
-func UpdateGame(
-	keyboardState input.KeyboardState,
-) (*Car, *Car) {
-	forward := PlayerCar.Forward()
-	moveSpeed := float32(0.2)
+func (g *Game) Update(keyboardState input.KeyboardState) (*Car, *Car) {
+	forward := g.PlayerCar.Forward()
+
 	if keyboardState.MoveFront {
-		PlayerCar.CarPosition.X += forward.X * moveSpeed
-		PlayerCar.CarPosition.Y += forward.Y * moveSpeed
-		PlayerCar.CarPosition.Z += forward.Z * moveSpeed
+		g.PlayerCar.CarPosition.AddScaledVector(forward, moveSpeed)
 	}
 	if keyboardState.MoveBack {
-		PlayerCar.CarPosition.X -= forward.X * moveSpeed
-		PlayerCar.CarPosition.Y -= forward.Y * moveSpeed
-		PlayerCar.CarPosition.Z -= forward.Z * moveSpeed
+		g.PlayerCar.CarPosition.AddScaledVector(forward, -moveSpeed)
 	}
 	if keyboardState.MoveRight {
-		PlayerCar.Yaw -= 0.1
+		g.PlayerCar.Yaw -= turnSpeed
 	}
 	if keyboardState.MoveLeft {
-		PlayerCar.Yaw += 0.1
+		g.PlayerCar.Yaw += turnSpeed
 	}
-
-	if keyboardState.Jump {
-		PlayerCar.CarPosition.Y += 1
+	if keyboardState.Jump && g.PlayerCar.CarPosition.Y <= 0 {
+		g.PlayerCar.CarPosition.Y += jumpHeight
 	}
-
 	if keyboardState.Reset {
-		ResetGame()
+		g.Reset()
 	}
 
-	// way to implement gravity
-	if PlayerCar.GetFrontWheelPosition().Y <= 0 {
+	g.PlayerCar.ApplyGravity()
+	g.AiCar.ApplyGravity()
 
-	}
-
-	if PlayerCar.GetRearWheelPosition().Y <= 0 {
-
-	}
-
-	if PlayerCar.CarPosition.Y > 0 {
-		PlayerCar.CarPosition.Y -= 0.1
-	}
-
-	if AiCar.CarPosition.Y > 0 {
-		AiCar.CarPosition.Y -= 0.1
-	}
-
-	return PlayerCar, AiCar
+	return g.PlayerCar, g.AiCar
 }
 
-func ResetGame() {
-	PlayerCar = CreateCar(
-		Position{
-			X: 0,
-			Y: 5,
-			Z: 0,
-		},
-	)
-	AiCar = CreateCar(
-		Position{
-			X: 10,
-			Y: 3,
-			Z: 10,
-		},
-	)
+func (c *Car) ApplyGravity() {
+	if c.CarPosition.Y > 0 {
+		c.CarPosition.Y -= gravity
+		if c.CarPosition.Y < 0 {
+			c.CarPosition.Y = 0
+		}
+	}
+}
+
+func (p *Position) AddScaledVector(vec UnitVector, scale float32) {
+	p.X += vec.X * scale
+	p.Y += vec.Y * scale
+	p.Z += vec.Z * scale
+}
+
+func (g *Game) Reset() {
+	g.PlayerCar = CreateCar(Position{X: 0, Y: 5, Z: 0})
+	g.AiCar = CreateCar(Position{X: 10, Y: 3, Z: 10})
+}
+
+func NewGame() *Game {
+	g := &Game{}
+	g.Reset()
+	return g
 }

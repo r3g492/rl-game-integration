@@ -69,7 +69,7 @@ func main() {
 	output.InitWindow(1600, 900)
 	defer output.CloseWindow()
 
-	game.ResetGame()
+	var g = game.NewGame()
 
 	for !output.ShouldClose() {
 
@@ -78,7 +78,7 @@ func main() {
 		_ = input.GetMouseInput()
 
 		// update game
-		playerCar, aiCar := game.UpdateGame(
+		playerCar, aiCar := g.Update(
 			keyboardInput,
 		)
 
