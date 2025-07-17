@@ -8,17 +8,13 @@ type Car struct {
 	Roll        float32
 }
 
-func CreateCar() *Car {
+func CreateCar(
+	position Position,
+) *Car {
 	var health int32 = 100
-	var playerPosition = Position{
-		X: 0,
-		Y: 5,
-		Z: 0,
-	}
-
 	return &Car{
 		Health:      health,
-		CarPosition: playerPosition,
+		CarPosition: position,
 		Yaw:         0,
 		Pitch:       0,
 		Roll:        0,

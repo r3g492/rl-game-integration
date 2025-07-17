@@ -11,11 +11,13 @@ var (
 	moveRightKey int32 = rl.KeyD
 	useKey       int32 = rl.KeyE
 	jumpKey      int32 = rl.KeySpace
+	reset        int32 = rl.KeyR
 )
 
 type KeyboardState struct {
 	MoveFront, MoveBack, MoveLeft, MoveRight bool
 	Use, Jump                                bool
+	Reset                                    bool
 }
 
 func GetKeyboardInput() KeyboardState {
@@ -26,5 +28,6 @@ func GetKeyboardInput() KeyboardState {
 		MoveRight: rl.IsKeyDown(moveRightKey),
 		Use:       rl.IsKeyDown(useKey),
 		Jump:      rl.IsKeyDown(jumpKey),
+		Reset:     rl.IsKeyDown(reset),
 	}
 }

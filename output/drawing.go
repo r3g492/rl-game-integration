@@ -7,6 +7,7 @@ import (
 
 func DrawOutput(
 	player *game.Car,
+	aiCar *game.Car,
 ) {
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.RayWhite)
@@ -28,6 +29,15 @@ func DrawOutput(
 		),
 	)
 
+	drawCar(player)
+	drawCar(aiCar)
+
+	rl.DrawGrid(100, 1)
+	rl.EndMode3D()
+	rl.EndDrawing()
+}
+
+func drawCar(player *game.Car) {
 	rl.DrawSphere(
 		rl.Vector3{X: player.CarPosition.X, Y: player.CarPosition.Y, Z: player.CarPosition.Z},
 		1,
@@ -60,8 +70,4 @@ func DrawOutput(
 		Z: player.CarPosition.Z + player.Forward().Z*arrowLength,
 	}
 	rl.DrawLine3D(start, end, rl.Red)
-
-	rl.DrawGrid(100, 1)
-	rl.EndMode3D()
-	rl.EndDrawing()
 }

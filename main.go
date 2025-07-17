@@ -22,7 +22,10 @@ type StepResponse struct {
 }
 
 // POST /reset
-func resetHandler(w http.ResponseWriter, r *http.Request) {
+func resetHandler(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
 	resp := map[string]int{"observation": game.GetRps()}
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Println("reset ")
@@ -30,7 +33,10 @@ func resetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // POST /step
-func stepHandler(w http.ResponseWriter, r *http.Request) {
+func stepHandler(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
 	var req struct {
 		Action int `json:"action"`
 	}
@@ -46,21 +52,11 @@ func stepHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(resp)
 }
 
-func testHandler(w http.ResponseWriter, r *http.Request) {
-	moveSpeed := float32(0.2)
-	playerCar.CarPosition.X += playerCar.Forward().X * moveSpeed
-	playerCar.CarPosition.Y += playerCar.Forward().Y * moveSpeed
-	playerCar.CarPosition.Z += playerCar.Forward().Z * moveSpeed
-}
-
-var playerCar *game.Car
-
 func main() {
 	// init http part
 	http.HandleFunc("/health", healthHandler)
 	http.HandleFunc("/reset", resetHandler)
 	http.HandleFunc("/step", stepHandler)
-	http.HandleFunc("/test", testHandler)
 	fmt.Println("Server running on http://localhost:8080")
 	go func() {
 		fmt.Println("Server running on http://localhost:8080")
@@ -73,7 +69,7 @@ func main() {
 	output.InitWindow(1600, 900)
 	defer output.CloseWindow()
 
-	playerCar = game.CreateCar()
+	game.ResetGame()
 
 	for !output.ShouldClose() {
 
@@ -82,16 +78,15 @@ func main() {
 		_ = input.GetMouseInput()
 
 		// update game
-		game.UpdateGame(
+		playerCar, aiCar := game.UpdateGame(
 			keyboardInput,
-			playerCar,
 		)
 
 		// draw output
 		output.DrawOutput(
 			playerCar,
+			aiCar,
 		)
-
 	}
 
 	// below code is for RPS. does not do anything at the moment.

@@ -10,6 +10,8 @@ type State struct {
 }
 
 var gameState State
+var PlayerCar *Car
+var AiCar *Car
 
 func GetRps() int {
 	return gameState.Rps
@@ -34,41 +36,67 @@ func Duel(input int) int {
 
 func UpdateGame(
 	keyboardState input.KeyboardState,
-	player *Car,
-) {
-	forward := player.Forward()
+) (*Car, *Car) {
+	forward := PlayerCar.Forward()
 	moveSpeed := float32(0.2)
 	if keyboardState.MoveFront {
-		player.CarPosition.X += forward.X * moveSpeed
-		player.CarPosition.Y += forward.Y * moveSpeed
-		player.CarPosition.Z += forward.Z * moveSpeed
+		PlayerCar.CarPosition.X += forward.X * moveSpeed
+		PlayerCar.CarPosition.Y += forward.Y * moveSpeed
+		PlayerCar.CarPosition.Z += forward.Z * moveSpeed
 	}
 	if keyboardState.MoveBack {
-		player.CarPosition.X -= forward.X * moveSpeed
-		player.CarPosition.Y -= forward.Y * moveSpeed
-		player.CarPosition.Z -= forward.Z * moveSpeed
+		PlayerCar.CarPosition.X -= forward.X * moveSpeed
+		PlayerCar.CarPosition.Y -= forward.Y * moveSpeed
+		PlayerCar.CarPosition.Z -= forward.Z * moveSpeed
 	}
 	if keyboardState.MoveRight {
-		player.Yaw -= 0.1
+		PlayerCar.Yaw -= 0.1
 	}
 	if keyboardState.MoveLeft {
-		player.Yaw += 0.1
+		PlayerCar.Yaw += 0.1
 	}
 
 	if keyboardState.Jump {
-		player.CarPosition.Y += 1
+		PlayerCar.CarPosition.Y += 1
+	}
+
+	if keyboardState.Reset {
+		ResetGame()
 	}
 
 	// way to implement gravity
-	if player.GetFrontWheelPosition().Y <= 0 {
+	if PlayerCar.GetFrontWheelPosition().Y <= 0 {
 
 	}
 
-	if player.GetRearWheelPosition().Y <= 0 {
+	if PlayerCar.GetRearWheelPosition().Y <= 0 {
 
 	}
 
-	if player.CarPosition.Y > 0 {
-		player.CarPosition.Y -= 0.1
+	if PlayerCar.CarPosition.Y > 0 {
+		PlayerCar.CarPosition.Y -= 0.1
 	}
+
+	if AiCar.CarPosition.Y > 0 {
+		AiCar.CarPosition.Y -= 0.1
+	}
+
+	return PlayerCar, AiCar
+}
+
+func ResetGame() {
+	PlayerCar = CreateCar(
+		Position{
+			X: 0,
+			Y: 5,
+			Z: 0,
+		},
+	)
+	AiCar = CreateCar(
+		Position{
+			X: 10,
+			Y: 3,
+			Z: 10,
+		},
+	)
 }
