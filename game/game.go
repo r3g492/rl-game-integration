@@ -46,11 +46,11 @@ func (g *Game) UpdatePlayer(keyboardState input.KeyboardState) {
 	g.PlayerCar.ApplyGravity()
 }
 
-func (c *Car) ApplyGravity() {
-	if c.CarPosition.Y > 0 {
-		c.CarPosition.Y -= gravity
-		if c.CarPosition.Y < 0 {
-			c.CarPosition.Y = 0
+func (car *Car) ApplyGravity() {
+	if car.CarPosition.Y > 0 {
+		car.CarPosition.Y -= gravity
+		if car.CarPosition.Y < 0 {
+			car.CarPosition.Y = 0
 		}
 	}
 }

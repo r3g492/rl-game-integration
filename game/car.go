@@ -24,8 +24,8 @@ func CreateCar(
 const wheelOffset = 0.3
 const floorOffset = 2.5
 
-func (p *Car) GetFrontWheelPosition() Position {
-	forward := p.Forward()
+func (car *Car) GetFrontWheelPosition() Position {
+	forward := car.Forward()
 	worldUp := UnitVector{X: 0, Y: 1, Z: 0}
 	right := Cross(forward, worldUp)
 	localUp := Cross(right, forward)
@@ -35,14 +35,14 @@ func (p *Car) GetFrontWheelPosition() Position {
 		Z: -localUp.Z,
 	}
 	return Position{
-		X: p.CarPosition.X + localDown.X*wheelOffset + forward.X*floorOffset,
-		Y: p.CarPosition.Y + localDown.Y*wheelOffset + forward.Y*floorOffset,
-		Z: p.CarPosition.Z + localDown.Z*wheelOffset + forward.Z*floorOffset,
+		X: car.CarPosition.X + localDown.X*wheelOffset + forward.X*floorOffset,
+		Y: car.CarPosition.Y + localDown.Y*wheelOffset + forward.Y*floorOffset,
+		Z: car.CarPosition.Z + localDown.Z*wheelOffset + forward.Z*floorOffset,
 	}
 }
 
-func (p *Car) GetRearWheelPosition() Position {
-	forward := p.Forward()
+func (car *Car) GetRearWheelPosition() Position {
+	forward := car.Forward()
 	worldUp := UnitVector{X: 0, Y: 1, Z: 0}
 	right := Cross(forward, worldUp)
 	localUp := Cross(right, forward)
@@ -52,8 +52,8 @@ func (p *Car) GetRearWheelPosition() Position {
 		Z: -localUp.Z,
 	}
 	return Position{
-		X: p.CarPosition.X + localDown.X*wheelOffset - forward.X*floorOffset,
-		Y: p.CarPosition.Y + localDown.Y*wheelOffset - forward.Y*floorOffset,
-		Z: p.CarPosition.Z + localDown.Z*wheelOffset - forward.Z*floorOffset,
+		X: car.CarPosition.X + localDown.X*wheelOffset - forward.X*floorOffset,
+		Y: car.CarPosition.Y + localDown.Y*wheelOffset - forward.Y*floorOffset,
+		Z: car.CarPosition.Z + localDown.Z*wheelOffset - forward.Z*floorOffset,
 	}
 }

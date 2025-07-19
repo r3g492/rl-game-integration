@@ -16,11 +16,11 @@ func Cross(a, b UnitVector) UnitVector {
 	}
 }
 
-func (p *Car) Forward() UnitVector {
-	cosPitch := float32(math.Cos(float64(p.Pitch)))
+func (car *Car) Forward() UnitVector {
+	cosPitch := float32(math.Cos(float64(car.Pitch)))
 	return UnitVector{
-		X: float32(math.Sin(float64(p.Yaw))) * cosPitch,
-		Y: float32(math.Sin(float64(p.Pitch))),
-		Z: float32(math.Cos(float64(p.Yaw))) * cosPitch,
+		X: float32(math.Sin(float64(car.Yaw))) * cosPitch,
+		Y: float32(math.Sin(float64(car.Pitch))),
+		Z: float32(math.Cos(float64(car.Yaw))) * cosPitch,
 	}
 }
