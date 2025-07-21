@@ -6,20 +6,17 @@ import (
 	ort "github.com/yalue/onnxruntime_go"
 	"log"
 	"net/http"
+	"sync"
 	"war-game-poc/game"
 	"war-game-poc/input"
 	"war-game-poc/output"
+	"war-game-poc/train"
 )
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "gunwoo")
-}
-
-type StepResponse struct {
-	Observation int  `json:"observation"`
-	Reward      int  `json:"reward"`
-	Done        bool `json:"done"`
-}
+var (
+	g     *game.Game
+	gLock sync.Mutex
+)
 
 // POST /reset
 func resetHandler(
@@ -33,30 +30,51 @@ func resetHandler(
 }
 
 // POST /step
-func stepHandler(
-	w http.ResponseWriter,
-	r *http.Request,
-) {
+func stepHandler(w http.ResponseWriter, r *http.Request) {
+	gLock.Lock()
+	defer gLock.Unlock()
+
 	var req struct {
-		Action int `json:"action"`
+		Action int     `json:"action"`
+		Value  float32 `json:"value"`
 	}
-	json.NewDecoder(r.Body).Decode(&req)
-	resp := StepResponse{
-		Observation: 2,
-		Reward:      1,
-		Done:        true,
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid JSON", http.StatusBadRequest)
+		return
 	}
+
+	if req.Action == 1 {
+		g.ChangeAiVelocity(req.Value)
+	}
+
+	obs := train.Observation{
+		CarX:  g.AiCar.CarPosition.X,
+		CarY:  g.AiCar.CarPosition.Y,
+		CarZ:  g.AiCar.CarPosition.Z,
+		Yaw:   g.AiCar.Yaw,
+		GoalX: g.Goal.X,
+		GoalY: g.Goal.Y,
+		GoalZ: g.Goal.Z,
+	}
+
+	// Compute reward, done, etc.
+	var reward float32 = 0
+	var done bool = false
+
+	resp := train.StepResponse{
+		Observation: obs,
+		Reward:      reward,
+		Done:        done,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Println("step ", req.Action)
 	json.NewEncoder(w).Encode(resp)
 }
 
 func main() {
 	// init http part
-	http.HandleFunc("/health", healthHandler)
 	http.HandleFunc("/reset", resetHandler)
 	http.HandleFunc("/step", stepHandler)
-	fmt.Println("Server running on http://localhost:8080")
 	go func() {
 		fmt.Println("Server running on http://localhost:8080")
 		if err := http.ListenAndServe(":8080", nil); err != nil {
@@ -68,8 +86,10 @@ func main() {
 	output.InitWindow(1600, 900)
 	defer output.CloseWindow()
 
-	var g = game.NewGame()
-
+	g = game.NewGame()
+	if g.AiCar == nil {
+		panic("g.AiCar is nil after NewGame")
+	}
 	for !output.ShouldClose() {
 
 		// gather input
@@ -77,7 +97,8 @@ func main() {
 		_ = input.GetMouseInput()
 
 		// update game
-		g.UpdatePlayer(keyboardInput)
+		g.ControlPlayer(keyboardInput)
+		g.UpdatePlayer()
 		g.UpdateAi()
 
 		if g.CheckGoalIn() {

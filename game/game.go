@@ -17,11 +17,7 @@ type Game struct {
 	Goal      Position
 }
 
-func (g *Game) UpdateAi() {
-	g.AiCar.ApplyGravity()
-}
-
-func (g *Game) UpdatePlayer(keyboardState input.KeyboardState) {
+func (g *Game) ControlPlayer(keyboardState input.KeyboardState) {
 	forward := g.PlayerCar.Forward()
 
 	if keyboardState.MoveFront {
@@ -42,7 +38,9 @@ func (g *Game) UpdatePlayer(keyboardState input.KeyboardState) {
 	if keyboardState.Reset {
 		g.Reset()
 	}
+}
 
+func (g *Game) UpdatePlayer() {
 	g.PlayerCar.ApplyGravity()
 }
 

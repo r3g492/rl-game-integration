@@ -6,6 +6,7 @@ type Car struct {
 	Yaw         float32
 	Pitch       float32
 	Roll        float32
+	Velocity    float32
 }
 
 func CreateCar(
@@ -18,6 +19,7 @@ func CreateCar(
 		Yaw:         0,
 		Pitch:       0,
 		Roll:        0,
+		Velocity:    0,
 	}
 }
 
