@@ -34,18 +34,12 @@ func stepHandler(w http.ResponseWriter, r *http.Request) {
 	gLock.Lock()
 	defer gLock.Unlock()
 
-	var req struct {
-		Action int     `json:"action"`
-		Value  float32 `json:"value"`
-	}
+	var req train.StepRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
-
-	if req.Action == 1 {
-		g.ChangeAiVelocity(req.Value)
-	}
+	g.ChangeAiVelocity(req.NewSpeed)
 
 	obs := train.Observation{
 		CarX:  g.AiCar.CarPosition.X,

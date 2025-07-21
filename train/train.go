@@ -21,3 +21,7 @@ type StepInfo struct {
 	DistanceToGoal float32 `json:"distance_to_goal"`
 	Collision      bool    `json:"collision"`
 }
+
+type StepRequest struct {
+	NewSpeed float32 `json:"newSpeed"`
+}
