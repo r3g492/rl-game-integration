@@ -23,9 +23,32 @@ func resetHandler(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
-	resp := map[string]int{"observation": 5}
+	g.Reset()
+	obs := train.Observation{
+		CarX:     g.AiCar.CarPosition.X,
+		CarY:     g.AiCar.CarPosition.Y,
+		CarZ:     g.AiCar.CarPosition.Z,
+		Velocity: g.AiCar.Velocity,
+		Yaw:      g.AiCar.Yaw,
+		GoalX:    g.Goal.X,
+		GoalY:    g.Goal.Y,
+		GoalZ:    g.Goal.Z,
+	}
+
+	var reward float32 = 0
+	var done = g.IsDone()
+	if done {
+		reward = g.Reward
+		g.Reset()
+	}
+
+	resp := train.StepResponse{
+		Observation: obs,
+		Reward:      reward,
+		Done:        done,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Println("reset ")
 	json.NewEncoder(w).Encode(resp)
 }
 
@@ -39,21 +62,25 @@ func stepHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
-	g.ChangeAiVelocity(req.NewSpeed)
+	g.ChangeAiVelocity(req.SpeedGradient)
+	g.ChangeAiRotation(req.RotationGradient)
 
 	obs := train.Observation{
-		CarX:  g.AiCar.CarPosition.X,
-		CarY:  g.AiCar.CarPosition.Y,
-		CarZ:  g.AiCar.CarPosition.Z,
-		Yaw:   g.AiCar.Yaw,
-		GoalX: g.Goal.X,
-		GoalY: g.Goal.Y,
-		GoalZ: g.Goal.Z,
+		CarX:     g.AiCar.CarPosition.X,
+		CarY:     g.AiCar.CarPosition.Y,
+		CarZ:     g.AiCar.CarPosition.Z,
+		Velocity: g.AiCar.Velocity,
+		Yaw:      g.AiCar.Yaw,
+		GoalX:    g.Goal.X,
+		GoalY:    g.Goal.Y,
+		GoalZ:    g.Goal.Z,
 	}
 
-	// Compute reward, done, etc.
 	var reward float32 = 0
-	var done bool = false
+	var done = g.IsDone()
+	if done {
+		reward = g.AiCar.Velocity
+	}
 
 	resp := train.StepResponse{
 		Observation: obs,

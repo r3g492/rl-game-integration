@@ -15,6 +15,7 @@ type Game struct {
 	PlayerCar *Car
 	AiCar     *Car
 	Goal      Position
+	Reward    float32
 }
 
 func (g *Game) ControlPlayer(keyboardState input.KeyboardState) {
@@ -74,8 +75,29 @@ func (g *Game) CheckGoalIn() bool {
 	return distanceSq <= goalThreshold*goalThreshold
 }
 
+func (g *Game) CheckGoalOut() bool {
+	const goalOutThreshold = 100.0
+	dx := g.AiCar.CarPosition.X - g.Goal.X
+	dy := g.AiCar.CarPosition.Y - g.Goal.Y
+	dz := g.AiCar.CarPosition.Z - g.Goal.Z
+	distanceSq := dx*dx + dy*dy + dz*dz
+	return distanceSq > goalOutThreshold*goalOutThreshold
+}
+
 func NewGame() *Game {
 	g := &Game{}
 	g.Reset()
 	return g
+}
+
+func (g *Game) IsDone() bool {
+	if g.CheckGoalIn() {
+		g.Reward = g.AiCar.Velocity
+		return true
+	}
+	if g.CheckGoalOut() {
+		g.Reward = -1
+		return true
+	}
+	return false
 }
