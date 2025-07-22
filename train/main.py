@@ -51,3 +51,34 @@ if __name__ == '__main__':
     model = PPO("MlpPolicy", env, verbose=1)
     model.learn(total_timesteps=100000)
     # (Optional: Export the model if needed)
+
+    # Evaluation: Run N episodes and track success
+    N_EPISODES = 10
+    success_count = 0
+    max_steps = 200  # Set max steps per episode to avoid infinite loops
+
+    for ep in range(N_EPISODES):
+        obs, _ = env.reset()
+        done = False
+        step_count = 0
+        total_reward = 0
+        print(f"\nEpisode {ep + 1} start")
+        while not done and step_count < max_steps:
+            action, _states = model.predict(obs, deterministic=True)
+            obs, reward, done, truncated, info = env.step(action)
+            total_reward += reward
+            step_count += 1
+
+            # Print every step (optional)
+            print(f"  Step {step_count}: obs={obs}, reward={reward:.2f}, done={done}")
+            # Optional: Add a delay for debugging/visualization
+            # time.sleep(0.05)
+
+        if done:
+            success_count += 1
+            print(
+                f"  -> Episode {ep + 1} finished (success or done) in {step_count} steps, total reward {total_reward:.2f}")
+        else:
+            print(f"  -> Episode {ep + 1} timed out at {max_steps} steps, total reward {total_reward:.2f}")
+
+    print(f"\nReached done in {success_count}/{N_EPISODES} episodes")
