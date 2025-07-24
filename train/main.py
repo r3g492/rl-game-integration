@@ -14,12 +14,11 @@ class GoCarRemoteEnv(gym.Env):
     def __init__(self, server_url="http://localhost:8080"):
         super().__init__()
         self.server_url = server_url
-        # Use the correct observation and action spaces!
         self.observation_space = spaces.Box(
             low=-np.inf, high=np.inf, shape=(8,), dtype=np.float32
         )
         self.action_space = spaces.Box(
-            low=np.array([-1.0, -1.0]),  # Example values, adjust as needed
+            low=np.array([-1.0, -1.0]),
             high=np.array([1.0, 1.0]),
             shape=(2,),
             dtype=np.float32
@@ -35,7 +34,6 @@ class GoCarRemoteEnv(gym.Env):
         return obs, {}
 
     def step(self, action):
-        # action should be a 2-element array-like
         speed, rotation = float(action[0]), float(action[1])
         payload = {"speedGradient": speed, "rotationGradient": rotation}
         resp = requests.post(f"{self.server_url}/step", json=payload)
@@ -48,14 +46,16 @@ class GoCarRemoteEnv(gym.Env):
         return obs, reward, done, False, info
 if __name__ == '__main__':
     env = GoCarRemoteEnv("http://localhost:8080")
-    model = PPO("MlpPolicy", env, verbose=1)
-    model.learn(total_timesteps=100000)
-    # (Optional: Export the model if needed)
 
-    # Evaluation: Run N episodes and track success
+    policy_kwargs = dict(
+        net_arch=[1024, 512, 256, 128]
+    )
+
+    model = PPO("MlpPolicy", env, verbose=1, policy_kwargs=policy_kwargs, seed=42)
+    model.learn(total_timesteps=500000)
     N_EPISODES = 10
     success_count = 0
-    max_steps = 200  # Set max steps per episode to avoid infinite loops
+    max_steps = 200
 
     for ep in range(N_EPISODES):
         obs, _ = env.reset()
@@ -64,16 +64,12 @@ if __name__ == '__main__':
         total_reward = 0
         print(f"\nEpisode {ep + 1} start")
         while not done and step_count < max_steps:
-            action, _states = model.predict(obs, deterministic=True)
+            action, _states = model.predict(obs, deterministic=False)
             obs, reward, done, truncated, info = env.step(action)
             total_reward += reward
             step_count += 1
 
-            # Print every step (optional)
             print(f"  Step {step_count}: obs={obs}, reward={reward:.2f}, done={done}")
-            # Optional: Add a delay for debugging/visualization
-            # time.sleep(0.05)
-
         if done:
             success_count += 1
             print(
