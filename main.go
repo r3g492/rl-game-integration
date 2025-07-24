@@ -79,7 +79,7 @@ func stepHandler(w http.ResponseWriter, r *http.Request) {
 	var reward float32 = 0
 	var done = g.IsDone()
 	if done {
-		reward = g.AiCar.Velocity
+		reward = g.Reward
 	}
 
 	resp := train.StepResponse{

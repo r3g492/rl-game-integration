@@ -1,6 +1,8 @@
 package game
 
 import (
+	"fmt"
+	"time"
 	"war-game-poc/input"
 )
 
@@ -16,6 +18,7 @@ type Game struct {
 	AiCar     *Car
 	Goal      Position
 	Reward    float32
+	StartTime time.Time
 }
 
 func (g *Game) ControlPlayer(keyboardState input.KeyboardState) {
@@ -64,10 +67,11 @@ func (g *Game) Reset() {
 	g.PlayerCar = CreateCar(Position{X: 0, Y: 5, Z: 0})
 	g.AiCar = CreateCar(Position{X: 10, Y: 3, Z: 10})
 	g.Goal = Position{X: 0, Y: 0, Z: 30}
+	g.StartTime = time.Now()
 }
 
 func (g *Game) CheckGoalIn() bool {
-	const goalThreshold = 1.0
+	const goalThreshold = 1.5
 	dx := g.AiCar.CarPosition.X - g.Goal.X
 	dy := g.AiCar.CarPosition.Y - g.Goal.Y
 	dz := g.AiCar.CarPosition.Z - g.Goal.Z
@@ -76,12 +80,24 @@ func (g *Game) CheckGoalIn() bool {
 }
 
 func (g *Game) CheckGoalOut() bool {
-	const goalOutThreshold = 100.0
+	const goalOutThreshold = 30.0
 	dx := g.AiCar.CarPosition.X - g.Goal.X
 	dy := g.AiCar.CarPosition.Y - g.Goal.Y
 	dz := g.AiCar.CarPosition.Z - g.Goal.Z
 	distanceSq := dx*dx + dy*dy + dz*dz
+	timeElapsed := float32(time.Since(g.StartTime).Seconds())
+	if timeElapsed > 10 {
+		return true
+	}
 	return distanceSq > goalOutThreshold*goalOutThreshold
+}
+
+func (g *Game) DistanceFromGoal() float32 {
+	dx := g.AiCar.CarPosition.X - g.Goal.X
+	dy := g.AiCar.CarPosition.Y - g.Goal.Y
+	dz := g.AiCar.CarPosition.Z - g.Goal.Z
+	distance := dx*dx + dy*dy + dz*dz
+	return distance
 }
 
 func NewGame() *Game {
@@ -92,11 +108,13 @@ func NewGame() *Game {
 
 func (g *Game) IsDone() bool {
 	if g.CheckGoalIn() {
-		g.Reward = g.AiCar.Velocity
+		g.Reward = 3
+		fmt.Println("goal in, reward: ", g.Reward)
 		return true
 	}
 	if g.CheckGoalOut() {
-		g.Reward = -1
+		g.Reward = -g.DistanceFromGoal() / 1000
+		fmt.Println("goal out, reward: ", g.Reward)
 		return true
 	}
 	return false
