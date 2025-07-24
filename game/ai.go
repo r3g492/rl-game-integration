@@ -18,8 +18,8 @@ func (g *Game) ChangeAiVelocity(speedGradient float32) {
 	if speedGradient > 0.5 {
 		speedGradient = 0.5
 	}
-	if speedGradient < -0.5 {
-		speedGradient = -0.5
+	if speedGradient < -1.5 {
+		speedGradient = -1.5
 	}
 	g.AiCar.Velocity += speedGradient
 	if g.AiCar.Velocity > MaxVelocity {

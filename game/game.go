@@ -14,11 +14,12 @@ const (
 )
 
 type Game struct {
-	PlayerCar *Car
-	AiCar     *Car
-	Goal      Position
-	Reward    float32
-	StartTime time.Time
+	PlayerCar   *Car
+	AiCar       *Car
+	Goal        Position
+	GoalReached bool
+	Reward      float32
+	StartTime   time.Time
 }
 
 func (g *Game) ControlPlayer(keyboardState input.KeyboardState) {
@@ -67,6 +68,7 @@ func (g *Game) Reset() {
 	g.PlayerCar = CreateCar(Position{X: 0, Y: 5, Z: 0})
 	g.AiCar = CreateCar(Position{X: 10, Y: 3, Z: 10})
 	g.Goal = Position{X: 0, Y: 0, Z: 30}
+	g.GoalReached = false
 	g.StartTime = time.Now()
 }
 
@@ -107,12 +109,15 @@ func NewGame() *Game {
 }
 
 func (g *Game) IsDone() bool {
-	if g.CheckGoalIn() {
+	if g.GoalReached {
+		return true
+	}
+	if !g.GoalReached && g.CheckGoalIn() {
 		g.Reward = 3
 		fmt.Println("goal in, reward: ", g.Reward)
 		return true
 	}
-	if g.CheckGoalOut() {
+	if !g.GoalReached && g.CheckGoalOut() {
 		g.Reward = -g.DistanceFromGoal() / 1000
 		fmt.Println("goal out, reward: ", g.Reward)
 		return true

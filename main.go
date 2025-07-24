@@ -80,6 +80,7 @@ func stepHandler(w http.ResponseWriter, r *http.Request) {
 	var done = g.IsDone()
 	if done {
 		reward = g.Reward
+		g.Reset()
 	}
 
 	resp := train.StepResponse{
@@ -122,9 +123,7 @@ func main() {
 		g.UpdatePlayer()
 		g.UpdateAi()
 
-		if g.CheckGoalIn() {
-			g.Reset()
-		}
+		g.IsDone()
 
 		// draw output
 		output.DrawGame(g)
