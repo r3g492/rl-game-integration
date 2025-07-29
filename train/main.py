@@ -31,6 +31,7 @@ class GoCarRemoteEnv(gym.Env):
         obs_dict = data["observation"]
         obs = np.array([obs_dict[k] for k in OBS_KEYS], dtype=np.float32)
         self.state = obs
+        print(f"[ENV] Reset observation: {obs}")
         return obs, {}
 
     def step(self, action):
@@ -39,11 +40,12 @@ class GoCarRemoteEnv(gym.Env):
         resp = requests.post(f"{self.server_url}/step", json=payload)
         data = resp.json()
         obs_dict = data["observation"]
-        obs = np.array([obs_dict[k] for k in OBS_KEYS], dtype=np.float32)
-        reward = data["reward"]
-        done = data["done"]
-        info = {}
-        return obs, reward, done, False, info
+        obs1 = np.array([obs_dict[k] for k in OBS_KEYS], dtype=np.float32)
+        reward1 = data["reward"]
+        done1 = data["done"]
+        info1 = {}
+        print(f"[ENV] Step | Action: {action}, Reward: {reward1}, Done: {done1}")
+        return obs1, reward1, done1, False, info1
 if __name__ == '__main__':
     env = GoCarRemoteEnv("http://localhost:8080")
 
@@ -52,10 +54,10 @@ if __name__ == '__main__':
     )
 
     model = PPO("MlpPolicy", env, verbose=1, policy_kwargs=policy_kwargs, seed=42)
-    model.learn(total_timesteps=500000)
+    model.learn(total_timesteps=50000)
     N_EPISODES = 10
     success_count = 0
-    max_steps = 200
+    max_steps = 1000
 
     for ep in range(N_EPISODES):
         obs, _ = env.reset()

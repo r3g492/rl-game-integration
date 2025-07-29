@@ -69,6 +69,7 @@ func (g *Game) Reset() {
 	g.AiCar = CreateCar(Position{X: 10, Y: 3, Z: 10})
 	g.Goal = Position{X: 0, Y: 0, Z: 30}
 	g.GoalReached = false
+	g.Reward = 0
 	g.StartTime = time.Now()
 }
 
@@ -110,6 +111,7 @@ func NewGame() *Game {
 
 func (g *Game) IsDone() bool {
 	if g.GoalReached {
+		g.Reward = 3
 		return true
 	}
 	if !g.GoalReached && g.CheckGoalIn() {
@@ -123,4 +125,29 @@ func (g *Game) IsDone() bool {
 		return true
 	}
 	return false
+}
+
+func (g *Game) Won() bool {
+	return g.GoalReached && g.Reward > 0
+}
+
+func (g *Game) Lost() bool {
+	return g.GoalReached && g.Reward < 0
+}
+
+func (g *Game) GoalUpdate() {
+	if g.GoalReached {
+		return
+	}
+	if g.CheckGoalIn() {
+		g.Reward = 3
+		g.GoalReached = true
+		fmt.Println("goal in, reward: ", g.Reward)
+	}
+	if g.CheckGoalOut() {
+		g.Reward = -g.DistanceFromGoal() / 1000
+		g.GoalReached = true
+
+		fmt.Println("goal out, reward: ", g.Reward)
+	}
 }

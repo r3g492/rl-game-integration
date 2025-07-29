@@ -36,10 +36,9 @@ func resetHandler(
 	}
 
 	var reward float32 = 0
-	var done = g.IsDone()
+	var done = g.GoalReached
 	if done {
 		reward = g.Reward
-		g.Reset()
 	}
 
 	resp := train.StepResponse{
@@ -76,11 +75,10 @@ func stepHandler(w http.ResponseWriter, r *http.Request) {
 		GoalZ:    g.Goal.Z,
 	}
 
-	var reward float32 = 0
-	var done = g.IsDone()
+	var reward float32 = g.Reward
+	var done = g.GoalReached
 	if done {
 		reward = g.Reward
-		g.Reset()
 	}
 
 	resp := train.StepResponse{
@@ -119,11 +117,12 @@ func main() {
 		_ = input.GetMouseInput()
 
 		// update game
-		g.ControlPlayer(keyboardInput)
-		g.UpdatePlayer()
-		g.UpdateAi()
-
-		g.IsDone()
+		if !g.GoalReached {
+			g.ControlPlayer(keyboardInput)
+			g.UpdatePlayer()
+			g.UpdateAi()
+			g.GoalUpdate()
+		}
 
 		// draw output
 		output.DrawGame(g)
