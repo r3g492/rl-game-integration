@@ -22,6 +22,12 @@ type Game struct {
 	StartTime   time.Time
 }
 
+func (g *Game) ControlOptions(keyboardState input.KeyboardState) {
+	if keyboardState.Reset {
+		g.Reset()
+	}
+}
+
 func (g *Game) ControlPlayer(keyboardState input.KeyboardState) {
 	forward := g.PlayerCar.Forward()
 
@@ -39,9 +45,6 @@ func (g *Game) ControlPlayer(keyboardState input.KeyboardState) {
 	}
 	if keyboardState.Jump && g.PlayerCar.CarPosition.Y <= 0 {
 		g.PlayerCar.CarPosition.Y += jumpHeight
-	}
-	if keyboardState.Reset {
-		g.Reset()
 	}
 }
 
@@ -107,24 +110,6 @@ func NewGame() *Game {
 	g := &Game{}
 	g.Reset()
 	return g
-}
-
-func (g *Game) IsDone() bool {
-	if g.GoalReached {
-		g.Reward = 3
-		return true
-	}
-	if !g.GoalReached && g.CheckGoalIn() {
-		g.Reward = 3
-		fmt.Println("goal in, reward: ", g.Reward)
-		return true
-	}
-	if !g.GoalReached && g.CheckGoalOut() {
-		g.Reward = -g.DistanceFromGoal() / 1000
-		fmt.Println("goal out, reward: ", g.Reward)
-		return true
-	}
-	return false
 }
 
 func (g *Game) Won() bool {

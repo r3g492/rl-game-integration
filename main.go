@@ -115,7 +115,7 @@ func main() {
 		// gather input
 		keyboardInput := input.GetKeyboardInput()
 		_ = input.GetMouseInput()
-
+		g.ControlOptions(keyboardInput)
 		// update game
 		if !g.GoalReached {
 			g.ControlPlayer(keyboardInput)
