@@ -61,8 +61,8 @@ func stepHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
-	g.ChangeAiVelocity(req.SpeedGradient)
-	g.ChangeAiRotation(req.RotationGradient)
+	g.ChangeAiTargetVelocity(req.SpeedGradient)
+	g.ChangeAiTargetRotation(req.RotationGradient)
 
 	obs := train.Observation{
 		CarX:     g.AiCar.CarPosition.X,

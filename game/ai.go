@@ -7,21 +7,14 @@ func (g *Game) UpdateAi() {
 	g.AiCar.ApplyGravity()
 	forward := g.AiCar.Forward()
 	g.AiCar.CarPosition.AddScaledVector(forward, g.AiCar.Velocity)
-}
 
-var (
-	MaxVelocity float32 = 2
-	MinVelocity float32 = -2
-)
-
-func (g *Game) ChangeAiVelocity(speedGradient float32) {
-	if speedGradient > 0.5 {
-		speedGradient = 0.5
+	if g.AiCar.TargetVelocityGradient > 0.5 {
+		g.AiCar.TargetVelocityGradient = 0.5
 	}
-	if speedGradient < -1.5 {
-		speedGradient = -1.5
+	if g.AiCar.TargetVelocityGradient < -0.5 {
+		g.AiCar.TargetVelocityGradient = -0.5
 	}
-	g.AiCar.Velocity += speedGradient
+	g.AiCar.Velocity += g.AiCar.TargetVelocityGradient
 	if g.AiCar.Velocity > MaxVelocity {
 		g.AiCar.Velocity = MaxVelocity
 	}
@@ -29,14 +22,25 @@ func (g *Game) ChangeAiVelocity(speedGradient float32) {
 	if g.AiCar.Velocity < MinVelocity {
 		g.AiCar.Velocity = MinVelocity
 	}
+
+	if g.AiCar.TargetRotationGradient > 0.1 {
+		g.AiCar.TargetRotationGradient = 0.1
+	}
+	if g.AiCar.TargetRotationGradient < -0.1 {
+		g.AiCar.TargetRotationGradient = -0.1
+	}
+	g.AiCar.Yaw += g.AiCar.TargetRotationGradient
 }
 
-func (g *Game) ChangeAiRotation(rotationGradient float32) {
-	if rotationGradient > 0.5 {
-		rotationGradient = 0.5
-	}
-	if rotationGradient < -0.5 {
-		rotationGradient = -0.5
-	}
-	g.AiCar.Yaw += rotationGradient
+var (
+	MaxVelocity float32 = 2
+	MinVelocity float32 = -2
+)
+
+func (g *Game) ChangeAiTargetVelocity(speedGradient float32) {
+	g.AiCar.TargetVelocityGradient = speedGradient
+}
+
+func (g *Game) ChangeAiTargetRotation(rotationGradient float32) {
+	g.AiCar.TargetRotationGradient = rotationGradient
 }

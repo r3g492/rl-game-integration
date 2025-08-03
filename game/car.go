@@ -1,12 +1,14 @@
 package game
 
 type Car struct {
-	Health      int32
-	CarPosition Position
-	Yaw         float32
-	Pitch       float32
-	Roll        float32
-	Velocity    float32
+	Health                 int32
+	CarPosition            Position
+	Yaw                    float32
+	Pitch                  float32
+	Roll                   float32
+	Velocity               float32
+	TargetVelocityGradient float32
+	TargetRotationGradient float32
 }
 
 func CreateCar(
@@ -14,12 +16,14 @@ func CreateCar(
 ) *Car {
 	var health int32 = 100
 	return &Car{
-		Health:      health,
-		CarPosition: position,
-		Yaw:         0,
-		Pitch:       0,
-		Roll:        0,
-		Velocity:    0,
+		Health:                 health,
+		CarPosition:            position,
+		Yaw:                    0,
+		Pitch:                  0,
+		Roll:                   0,
+		Velocity:               0,
+		TargetVelocityGradient: 0,
+		TargetRotationGradient: 0,
 	}
 }
 
