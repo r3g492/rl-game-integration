@@ -46,7 +46,7 @@ func (g *Game) UpdateAi(
 		0.5,
 	)
 
-	if g.AiCar.Velocity > 0 {
+	if g.AiCar.Velocity >= 0 {
 		g.AiCar.Yaw += g.AiCar.TargetRotationGradient * dt * 2
 	} else {
 		g.AiCar.Yaw -= g.AiCar.TargetRotationGradient * dt * 2

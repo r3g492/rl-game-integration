@@ -88,7 +88,7 @@ func (g *Game) UpdatePlayer(
 		0.5,
 	)
 
-	if g.PlayerCar.Velocity > 0 {
+	if g.PlayerCar.Velocity >= 0 {
 		g.PlayerCar.Yaw += g.PlayerCar.TargetRotationGradient * dt * 2
 	} else {
 		g.PlayerCar.Yaw -= g.PlayerCar.TargetRotationGradient * dt * 2
