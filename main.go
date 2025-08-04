@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 	"war-game-poc/game"
 	"war-game-poc/input"
 	"war-game-poc/output"
@@ -110,8 +111,12 @@ func main() {
 	if g.AiCar == nil {
 		panic("g.AiCar is nil after NewGame")
 	}
-	for !output.ShouldClose() {
 
+	lastTime := time.Now()
+	for !output.ShouldClose() {
+		now := time.Now()
+		dt := float32(now.Sub(lastTime).Seconds())
+		lastTime = now
 		// gather input
 		keyboardInput := input.GetKeyboardInput()
 		_ = input.GetMouseInput()
@@ -119,8 +124,8 @@ func main() {
 		// update game
 		if !g.GoalReached {
 			g.ControlPlayer(keyboardInput)
-			g.UpdatePlayer()
-			g.UpdateAi()
+			g.UpdatePlayer(dt)
+			g.UpdateAi(dt)
 			g.GoalUpdate()
 		}
 

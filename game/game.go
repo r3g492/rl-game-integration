@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 	"war-game-poc/input"
+	"war-game-poc/utility"
 )
 
 const (
@@ -29,27 +30,69 @@ func (g *Game) ControlOptions(keyboardState input.KeyboardState) {
 }
 
 func (g *Game) ControlPlayer(keyboardState input.KeyboardState) {
-	forward := g.PlayerCar.Forward()
-
 	if keyboardState.MoveFront {
-		g.PlayerCar.CarPosition.AddScaledVector(forward, moveSpeed)
-	}
-	if keyboardState.MoveBack {
-		g.PlayerCar.CarPosition.AddScaledVector(forward, -moveSpeed)
+		g.PlayerCar.TargetVelocityGradient = 1
+	} else if keyboardState.MoveBack {
+		g.PlayerCar.TargetVelocityGradient = -1
+	} else {
+		g.PlayerCar.TargetVelocityGradient = 0
 	}
 	if keyboardState.MoveRight {
-		g.PlayerCar.Yaw -= turnSpeed
+		g.PlayerCar.TargetRotationGradient = -1
+	} else if keyboardState.MoveLeft {
+		g.PlayerCar.TargetRotationGradient = 1
+	} else {
+		g.PlayerCar.TargetRotationGradient = 0
 	}
-	if keyboardState.MoveLeft {
-		g.PlayerCar.Yaw += turnSpeed
-	}
-	if keyboardState.Jump && g.PlayerCar.CarPosition.Y <= 0 {
-		g.PlayerCar.CarPosition.Y += jumpHeight
-	}
+
 }
 
-func (g *Game) UpdatePlayer() {
+func (g *Game) UpdatePlayer(
+	dt float32,
+) {
 	g.PlayerCar.ApplyGravity()
+	forward := g.PlayerCar.Forward()
+
+	// velocity
+	g.PlayerCar.Velocity = utility.Suppress(
+		g.PlayerCar.Velocity,
+		-0.001,
+		0.001,
+	)
+	g.PlayerCar.CarPosition.AddScaledVector(forward, g.PlayerCar.Velocity)
+	g.PlayerCar.TargetVelocityGradient = utility.Clamp(
+		g.PlayerCar.TargetVelocityGradient,
+		-1.0,
+		1.0,
+	)
+	g.PlayerCar.Velocity = utility.Friction(
+		g.PlayerCar.Velocity,
+		0.05,
+	)
+	g.PlayerCar.Velocity += g.PlayerCar.TargetVelocityGradient * dt * 5
+	g.PlayerCar.Velocity = utility.Clamp(
+		g.PlayerCar.Velocity,
+		MinVelocity,
+		MaxVelocity,
+	)
+
+	// rotation
+	g.PlayerCar.TargetRotationGradient = utility.Clamp(
+		g.PlayerCar.TargetRotationGradient,
+		-1.0,
+		1.0,
+	)
+	g.PlayerCar.TargetRotationGradient = utility.Suppress(
+		g.PlayerCar.TargetRotationGradient,
+		-0.5,
+		0.5,
+	)
+
+	if g.PlayerCar.Velocity > 0 {
+		g.PlayerCar.Yaw += g.PlayerCar.TargetRotationGradient * dt * 2
+	} else {
+		g.PlayerCar.Yaw -= g.PlayerCar.TargetRotationGradient * dt * 2
+	}
 }
 
 func (car *Car) ApplyGravity() {
@@ -130,7 +173,7 @@ func (g *Game) GoalUpdate() {
 		fmt.Println("goal in, reward: ", g.Reward)
 	}
 	if g.CheckGoalOut() {
-		g.Reward = -g.DistanceFromGoal() / 1000
+		g.Reward = -g.DistanceFromGoal() / 100
 		g.GoalReached = true
 
 		fmt.Println("goal out, reward: ", g.Reward)
