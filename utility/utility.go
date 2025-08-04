@@ -25,3 +25,10 @@ func Friction(x, delta float32) float32 {
 	}
 	return 0
 }
+
+func Max(x, y float32) float32 {
+	if x > y {
+		return x
+	}
+	return y
+}

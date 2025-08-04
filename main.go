@@ -36,11 +36,8 @@ func resetHandler(
 		GoalZ:    g.Goal.Z,
 	}
 
-	var reward float32 = 0
+	var reward float32 = g.Reward
 	var done = g.GoalReached
-	if done {
-		reward = g.Reward
-	}
 
 	resp := train.StepResponse{
 		Observation: obs,
@@ -78,9 +75,14 @@ func stepHandler(w http.ResponseWriter, r *http.Request) {
 
 	var reward float32 = g.Reward
 	var done = g.GoalReached
-	if done {
-		reward = g.Reward
-	}
+
+	g.SaveAiPrevPosition(
+		game.Position{
+			X: g.AiCar.CarPosition.X,
+			Y: g.AiCar.CarPosition.Y,
+			Z: g.AiCar.CarPosition.Z,
+		},
+	)
 
 	resp := train.StepResponse{
 		Observation: obs,

@@ -15,12 +15,13 @@ const (
 )
 
 type Game struct {
-	PlayerCar   *Car
-	AiCar       *Car
-	Goal        Position
-	GoalReached bool
-	Reward      float32
-	StartTime   time.Time
+	PlayerCar      *Car
+	AiCar          *Car
+	AiPrevPosition Position
+	Goal           Position
+	GoalReached    bool
+	Reward         float32
+	StartTime      time.Time
 }
 
 func (g *Game) ControlOptions(keyboardState input.KeyboardState) {
@@ -112,7 +113,9 @@ func (p *Position) AddScaledVector(vec UnitVector, scale float32) {
 
 func (g *Game) Reset() {
 	g.PlayerCar = CreateCar(Position{X: 0, Y: 5, Z: 0})
-	g.AiCar = CreateCar(Position{X: 10, Y: 3, Z: 10})
+	aiPos := Position{X: 10, Y: 3, Z: 10}
+	g.AiCar = CreateCar(aiPos)
+	g.AiPrevPosition = aiPos
 	g.Goal = Position{X: 0, Y: 0, Z: 30}
 	g.GoalReached = false
 	g.Reward = 0
@@ -141,14 +144,6 @@ func (g *Game) CheckGoalOut() bool {
 	return distanceSq > goalOutThreshold*goalOutThreshold
 }
 
-func (g *Game) DistanceFromGoal() float32 {
-	dx := g.AiCar.CarPosition.X - g.Goal.X
-	dy := g.AiCar.CarPosition.Y - g.Goal.Y
-	dz := g.AiCar.CarPosition.Z - g.Goal.Z
-	distance := dx*dx + dy*dy + dz*dz
-	return distance
-}
-
 func NewGame() *Game {
 	g := &Game{}
 	g.Reset()
@@ -168,14 +163,19 @@ func (g *Game) GoalUpdate() {
 		return
 	}
 	if g.CheckGoalIn() {
-		g.Reward = 3
+		g.Reward = 1.0
 		g.GoalReached = true
 		fmt.Println("goal in, reward: ", g.Reward)
+		return
 	}
 	if g.CheckGoalOut() {
-		g.Reward = -g.DistanceFromGoal() / 100
+		g.Reward = -1.0
 		g.GoalReached = true
-
 		fmt.Println("goal out, reward: ", g.Reward)
+		return
+	}
+
+	if Distance(g.Goal, g.AiCar.CarPosition) < Distance(g.Goal, g.AiPrevPosition) {
+		g.Reward = 0.00005
 	}
 }

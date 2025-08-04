@@ -2,9 +2,6 @@ package game
 
 import "war-game-poc/utility"
 
-type Action struct {
-}
-
 func (g *Game) UpdateAi(
 	dt float32,
 ) {
@@ -83,4 +80,8 @@ func (g *Game) ChangeAiTargetVelocity(speedGradient float32) {
 func (g *Game) ChangeAiTargetRotation(rotationGradient float32) {
 	// fmt.Println("change AiTargetRotation: ", rotationGradient)
 	g.AiCar.TargetRotationGradient = rotationGradient
+}
+
+func (g *Game) SaveAiPrevPosition(prev Position) {
+
 }
