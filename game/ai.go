@@ -1,6 +1,8 @@
 package game
 
-import "war-game-poc/utility"
+import (
+	"war-game-poc/utility"
+)
 
 func (g *Game) UpdateAi(
 	dt float32,
@@ -70,18 +72,33 @@ func (g *Game) friction(
 var (
 	MaxVelocity float32 = 2
 	MinVelocity float32 = -2
+	myConst     float32 = 0.5
 )
 
 func (g *Game) ChangeAiTargetVelocity(speedGradient float32) {
-	// fmt.Println("change AiTargetVelocity: ", speedGradient)
-	g.AiCar.TargetVelocityGradient = speedGradient
+	if speedGradient > -myConst && speedGradient < myConst {
+		g.AiCar.TargetVelocityGradient = 0
+		return
+	}
+	if speedGradient >= myConst {
+		g.AiCar.TargetVelocityGradient = 1
+	} else {
+		g.AiCar.TargetVelocityGradient = -1
+	}
 }
 
 func (g *Game) ChangeAiTargetRotation(rotationGradient float32) {
-	// fmt.Println("change AiTargetRotation: ", rotationGradient)
-	g.AiCar.TargetRotationGradient = rotationGradient
+	if rotationGradient > -myConst && rotationGradient < myConst {
+		g.AiCar.TargetRotationGradient = 0
+		return
+	}
+	if rotationGradient >= myConst {
+		g.AiCar.TargetRotationGradient = 1
+	} else {
+		g.AiCar.TargetRotationGradient = -1
+	}
 }
 
 func (g *Game) SaveAiPrevPosition(prev Position) {
-
+	g.AiPrevPosition = prev
 }

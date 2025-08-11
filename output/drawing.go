@@ -1,21 +1,46 @@
 package output
 
 import (
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"fmt"
 	"math"
 	"war-game-poc/game"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
 func DrawGame(
 	g *game.Game,
 ) {
+	if g.Done() {
+		rl.BeginDrawing()
+		g.IsSuccess()
+
+		rl.DrawText(
+			fmt.Sprintf("done: %t\nsuccess: %t\nreward: %f", g.Done(), g.IsSuccess(), g.Reward()),
+			300,
+			300,
+			50,
+			rl.Black,
+		)
+		rl.EndDrawing()
+		return
+	}
+
+	rl.DrawText(
+		fmt.Sprintf("reward: %f", g.Reward()),
+		300,
+		300,
+		50,
+		rl.Black,
+	)
+
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.RayWhite)
 	rl.BeginMode3D(
 		rl.NewCamera3D(
 			rl.Vector3{
 				X: g.PlayerCar.CarPosition.X - 12*g.PlayerCar.Forward().X,
-				Y: g.PlayerCar.CarPosition.Y + 12,
+				Y: g.PlayerCar.CarPosition.Y + 200,
 				Z: g.PlayerCar.CarPosition.Z - 12*g.PlayerCar.Forward().Z,
 			},
 			rl.Vector3{

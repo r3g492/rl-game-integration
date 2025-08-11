@@ -8,10 +8,7 @@ import (
 )
 
 const (
-	moveSpeed  = float32(0.2)
-	turnSpeed  = 0.1
-	gravity    = 0.1
-	jumpHeight = 1.0
+	gravity = 0.1
 )
 
 type Game struct {
@@ -122,7 +119,7 @@ func (g *Game) Reset() {
 	g.StartTime = time.Now()
 }
 
-func (g *Game) CheckGoalIn() bool {
+func (g *Game) AiCheckGoalIn() bool {
 	const goalThreshold = 1.5
 	dx := g.AiCar.CarPosition.X - g.Goal.X
 	dy := g.AiCar.CarPosition.Y - g.Goal.Y
@@ -131,7 +128,16 @@ func (g *Game) CheckGoalIn() bool {
 	return distanceSq <= goalThreshold*goalThreshold
 }
 
-func (g *Game) CheckGoalOut() bool {
+func (g *Game) PlayerCheckGoalIn() bool {
+	const goalThreshold = 1.5
+	dx := g.PlayerCar.CarPosition.X - g.Goal.X
+	dy := g.PlayerCar.CarPosition.Y - g.Goal.Y
+	dz := g.PlayerCar.CarPosition.Z - g.Goal.Z
+	distanceSq := dx*dx + dy*dy + dz*dz
+	return distanceSq <= goalThreshold*goalThreshold
+}
+
+func (g *Game) AiCheckGoalOut() bool {
 	const goalOutThreshold = 200
 	dx := g.AiCar.CarPosition.X - g.Goal.X
 	dy := g.AiCar.CarPosition.Y - g.Goal.Y
@@ -159,15 +165,15 @@ func (g *Game) Lost() bool {
 }
 
 func (g *Game) Done() bool {
-	return g.IsSuccess() || g.CheckGoalOut()
+	return g.IsSuccess() || g.AiCheckGoalOut()
 }
 
 func (g *Game) Truncated() bool {
-	return g.CheckGoalOut()
+	return g.AiCheckGoalOut()
 }
 
 func (g *Game) IsSuccess() bool {
-	return g.CheckGoalIn()
+	return g.AiCheckGoalIn() || g.PlayerCheckGoalIn()
 }
 
 func (g *Game) Reward() float32 {
@@ -180,7 +186,7 @@ func (g *Game) Reward() float32 {
 	}
 
 	if Distance(g.Goal, g.AiCar.CarPosition) < Distance(g.Goal, g.AiPrevPosition) {
-		return 0.00005
+		return 0.001
 	}
 
 	return 0

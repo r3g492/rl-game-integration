@@ -74,14 +74,6 @@ func stepHandler(w http.ResponseWriter, r *http.Request) {
 		GoalZ:    g.Goal.Z,
 	}
 
-	g.SaveAiPrevPosition(
-		game.Position{
-			X: g.AiCar.CarPosition.X,
-			Y: g.AiCar.CarPosition.Y,
-			Z: g.AiCar.CarPosition.Z,
-		},
-	)
-
 	resp := train.StepResponse{
 		Observation: obs,
 		Reward:      g.Reward(),
@@ -89,6 +81,14 @@ func stepHandler(w http.ResponseWriter, r *http.Request) {
 		Truncated:   g.Truncated(),
 		IsSuccess:   g.IsSuccess(),
 	}
+
+	g.SaveAiPrevPosition(
+		game.Position{
+			X: g.AiCar.CarPosition.X,
+			Y: g.AiCar.CarPosition.Y,
+			Z: g.AiCar.CarPosition.Z,
+		},
+	)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)

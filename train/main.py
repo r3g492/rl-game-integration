@@ -84,7 +84,7 @@ if __name__ == '__main__':
     reward_callback = EpisodeRewardPrinterCallback()
 
     model = PPO("MlpPolicy", env, verbose=1, policy_kwargs=policy_kwargs, seed=42)
-    model.learn(total_timesteps=100000, callback=reward_callback)
+    model.learn(total_timesteps=1800000, callback=reward_callback)
 
     # ----- quick test -----
     N_EPISODES = 10
