@@ -17,6 +17,7 @@ type Game struct {
 	AiPrevPosition Position
 	Goal           Position
 	StartTime      time.Time
+	LastRewardTime time.Time
 }
 
 func (g *Game) ControlOptions(keyboardState input.KeyboardState) {
@@ -117,6 +118,7 @@ func (g *Game) Reset() {
 		Z: rand.Float32()*200 - 100,
 	}
 	g.StartTime = time.Now()
+	g.LastRewardTime = time.Now()
 }
 
 func (g *Game) AiCheckGoalIn() bool {
@@ -185,8 +187,11 @@ func (g *Game) Reward() float32 {
 		return -1.0
 	}
 
-	if Distance(g.Goal, g.AiCar.CarPosition) < Distance(g.Goal, g.AiPrevPosition) {
-		return 0.001
+	if time.Since(g.LastRewardTime).Seconds() > 1 {
+		if Distance(g.Goal, g.AiCar.CarPosition) < Distance(g.Goal, g.AiPrevPosition) {
+			return 0.1
+		}
+		g.LastRewardTime = time.Now()
 	}
 
 	return 0
