@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	ort "github.com/yalue/onnxruntime_go"
 	"log"
 	"net/http"
 	"sync"
@@ -24,6 +23,9 @@ func resetHandler(
 	w http.ResponseWriter,
 	r *http.Request,
 ) {
+	gLock.Lock()
+	defer gLock.Unlock()
+
 	g.Reset()
 	obs := train.Observation{
 		CarX:     g.AiCar.CarPosition.X,
@@ -36,13 +38,12 @@ func resetHandler(
 		GoalZ:    g.Goal.Z,
 	}
 
-	var reward float32 = g.Reward
-	var done = g.GoalReached
-
 	resp := train.StepResponse{
 		Observation: obs,
-		Reward:      reward,
-		Done:        done,
+		Reward:      0,
+		Done:        g.Done(),
+		Truncated:   g.Truncated(),
+		IsSuccess:   g.IsSuccess(),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -73,9 +74,6 @@ func stepHandler(w http.ResponseWriter, r *http.Request) {
 		GoalZ:    g.Goal.Z,
 	}
 
-	var reward float32 = g.Reward
-	var done = g.GoalReached
-
 	g.SaveAiPrevPosition(
 		game.Position{
 			X: g.AiCar.CarPosition.X,
@@ -86,8 +84,10 @@ func stepHandler(w http.ResponseWriter, r *http.Request) {
 
 	resp := train.StepResponse{
 		Observation: obs,
-		Reward:      reward,
-		Done:        done,
+		Reward:      g.Reward(),
+		Done:        g.Done(),
+		Truncated:   g.Truncated(),
+		IsSuccess:   g.IsSuccess(),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -124,65 +124,13 @@ func main() {
 		_ = input.GetMouseInput()
 		g.ControlOptions(keyboardInput)
 		// update game
-		if !g.GoalReached {
+		if !g.Done() {
 			g.ControlPlayer(keyboardInput)
 			g.UpdatePlayer(dt)
 			g.UpdateAi(dt)
-			g.GoalUpdate()
 		}
 
 		// draw output
 		output.DrawGame(g)
 	}
-
-	// below code is for RPS. does not do anything at the moment.
-	ort.SetSharedLibraryPath("./libonnxruntime/libonnxruntime.so")
-	err := ort.InitializeEnvironment()
-	if err != nil {
-		panic(err)
-	}
-	defer ort.DestroyEnvironment()
-
-	// Input: int32[1,1]
-	inputData := []int32{1} // 0: Rock, 1: Paper, 2: Scissors
-	inputShape := ort.NewShape(1, 1)
-	inputTensor, err := ort.NewTensor(inputShape, inputData)
-	if err != nil {
-		log.Fatalf("failed to create input tensor: %v", err)
-	}
-	defer inputTensor.Destroy()
-
-	// Output: int64[1]
-	outputShape := ort.NewShape(1)
-	outputTensor, err := ort.NewEmptyTensor[int64](outputShape)
-	if err != nil {
-		log.Fatalf("failed to create output tensor: %v", err)
-	}
-	defer outputTensor.Destroy()
-
-	// Session (input/output names from Netron: "input" and "output")
-	session, err := ort.NewAdvancedSession("./rps_agent_visible.onnx",
-		[]string{"input"}, []string{"output"},
-		[]ort.Value{inputTensor}, []ort.Value{outputTensor}, nil)
-	if err != nil {
-		log.Fatalf("failed to create session: %v", err)
-	}
-	defer session.Destroy()
-
-	// Run inference
-	err = session.Run()
-	if err != nil {
-		log.Fatalf("failed to run session: %v", err)
-	}
-
-	// Get output values (predicted action)
-	outputVals := outputTensor.GetData()
-	fmt.Printf("Predicted action index: %d\n", outputVals[0])
-	actions := []string{"Rock", "Paper", "Scissors"}
-	if int(outputVals[0]) >= 0 && int(outputVals[0]) < len(actions) {
-		fmt.Printf("Predicted action: %s\n", actions[outputVals[0]])
-	} else {
-		fmt.Printf("Invalid action index: %d\n", outputVals[0])
-	}
-
 }

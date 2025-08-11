@@ -1,7 +1,7 @@
 package game
 
 import (
-	"fmt"
+	"math/rand"
 	"time"
 	"war-game-poc/input"
 	"war-game-poc/utility"
@@ -19,8 +19,6 @@ type Game struct {
 	AiCar          *Car
 	AiPrevPosition Position
 	Goal           Position
-	GoalReached    bool
-	Reward         float32
 	StartTime      time.Time
 }
 
@@ -112,13 +110,15 @@ func (p *Position) AddScaledVector(vec UnitVector, scale float32) {
 }
 
 func (g *Game) Reset() {
-	g.PlayerCar = CreateCar(Position{X: 0, Y: 5, Z: 0})
-	aiPos := Position{X: 10, Y: 3, Z: 10}
+	g.PlayerCar = CreateCar(Position{X: 5, Y: 5, Z: 0})
+	aiPos := Position{X: 0, Y: 0, Z: 0}
 	g.AiCar = CreateCar(aiPos)
 	g.AiPrevPosition = aiPos
-	g.Goal = Position{X: 0, Y: 0, Z: 30}
-	g.GoalReached = false
-	g.Reward = 0
+	g.Goal = Position{
+		X: rand.Float32()*200 - 100,
+		Y: 0,
+		Z: rand.Float32()*200 - 100,
+	}
 	g.StartTime = time.Now()
 }
 
@@ -132,7 +132,7 @@ func (g *Game) CheckGoalIn() bool {
 }
 
 func (g *Game) CheckGoalOut() bool {
-	const goalOutThreshold = 30.0
+	const goalOutThreshold = 200
 	dx := g.AiCar.CarPosition.X - g.Goal.X
 	dy := g.AiCar.CarPosition.Y - g.Goal.Y
 	dz := g.AiCar.CarPosition.Z - g.Goal.Z
@@ -151,31 +151,37 @@ func NewGame() *Game {
 }
 
 func (g *Game) Won() bool {
-	return g.GoalReached && g.Reward > 0
+	return g.IsSuccess()
 }
 
 func (g *Game) Lost() bool {
-	return g.GoalReached && g.Reward < 0
+	return g.Done() && !g.IsSuccess()
 }
 
-func (g *Game) GoalUpdate() {
-	if g.GoalReached {
-		return
+func (g *Game) Done() bool {
+	return g.IsSuccess() || g.CheckGoalOut()
+}
+
+func (g *Game) Truncated() bool {
+	return g.CheckGoalOut()
+}
+
+func (g *Game) IsSuccess() bool {
+	return g.CheckGoalIn()
+}
+
+func (g *Game) Reward() float32 {
+	if g.IsSuccess() {
+		return 1.0
 	}
-	if g.CheckGoalIn() {
-		g.Reward = 1.0
-		g.GoalReached = true
-		fmt.Println("goal in, reward: ", g.Reward)
-		return
-	}
-	if g.CheckGoalOut() {
-		g.Reward = -1.0
-		g.GoalReached = true
-		fmt.Println("goal out, reward: ", g.Reward)
-		return
+
+	if g.Done() {
+		return -1.0
 	}
 
 	if Distance(g.Goal, g.AiCar.CarPosition) < Distance(g.Goal, g.AiPrevPosition) {
-		g.Reward = 0.00005
+		return 0.00005
 	}
+
+	return 0
 }

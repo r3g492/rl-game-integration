@@ -24,7 +24,7 @@ func (g *Game) UpdateAi(
 		g.AiCar.Velocity,
 		0.05,
 	)
-	g.AiCar.Velocity += g.AiCar.TargetVelocityGradient * dt * 5
+	g.AiCar.Velocity += g.AiCar.TargetVelocityGradient * dt * 10
 	g.AiCar.Velocity = utility.Clamp(
 		g.AiCar.Velocity,
 		MinVelocity,

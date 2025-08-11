@@ -15,6 +15,8 @@ type StepResponse struct {
 	Observation Observation `json:"observation"`
 	Reward      float32     `json:"reward"`
 	Done        bool        `json:"done"`
+	Truncated   bool        `json:"truncated"`  // timeout / step cap
+	IsSuccess   bool        `json:"is_success"` // reached goal
 }
 
 type StepRequest struct {
