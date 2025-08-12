@@ -4,6 +4,9 @@ import numpy as np
 import requests
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import BaseCallback
+import torch as th
+from typing import Tuple
+from stable_baselines3.common.policies import BasePolicy
 
 OBS_KEYS = [
     "car_x", "car_y", "car_z",
@@ -77,6 +80,16 @@ class EpisodeRewardPrinterCallback(BaseCallback):
             self.episode_reward = 0.0
         return True
 
+class OnnxableSB3Policy(th.nn.Module):
+    def __init__(self, policy: BasePolicy):
+        super().__init__()
+        self.policy = policy
+
+    # Returns (actions, values, log_prob) for PPO; we’ll use actions
+    def forward(self, observation: th.Tensor) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
+        # deterministic=True => mean action (no sampling)
+        return self.policy(observation, deterministic=True)
+
 if __name__ == '__main__':
     env = GoCarRemoteEnv("http://localhost:8080")
 
@@ -84,10 +97,10 @@ if __name__ == '__main__':
     reward_callback = EpisodeRewardPrinterCallback()
 
     model = PPO("MlpPolicy", env, verbose=1, policy_kwargs=policy_kwargs, seed=42)
-    model.learn(total_timesteps=1800000, callback=reward_callback)
+    model.learn(total_timesteps=25200000, callback=reward_callback)
 
     # ----- quick test -----
-    N_EPISODES = 10
+    N_EPISODES = 1
     success_count = 0
     max_steps = 5000
 
@@ -113,3 +126,25 @@ if __name__ == '__main__':
             print(f"  -> TERMINATED (fail) in {step_count} steps, total reward {total_reward:.2f}")
 
     print(f"\nReached success in {success_count}/{N_EPISODES} episodes")
+
+    orig_device = model.device
+    model.policy.to("cpu")
+
+    onnx_policy = OnnxableSB3Policy(model.policy).eval()
+
+    obs_shape = env.observation_space.shape
+    dummy = th.randn(1, *obs_shape, device="cpu", dtype=th.float32)
+
+    th.onnx.export(
+        onnx_policy,
+        dummy,
+        "ppo_gocar.onnx",
+        opset_version=17,
+        input_names=["obs"],
+        output_names=["action", "value", "log_prob"],
+        dynamic_axes={"obs": {0: "batch"}, "action": {0: "batch"}, "value": {0: "batch"}, "log_prob": {0: "batch"}},
+    )
+
+    model.policy.to(orig_device)
+    print("Saved to ppo_gocar.onnx")
+

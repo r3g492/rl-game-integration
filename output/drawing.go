@@ -13,8 +13,7 @@ func DrawGame(
 ) {
 	if g.Done() {
 		rl.BeginDrawing()
-		g.IsSuccess()
-
+		rl.ClearBackground(rl.RayWhite)
 		rl.DrawText(
 			fmt.Sprintf("done: %t\nsuccess: %t\nreward: %f", g.Done(), g.IsSuccess(), g.Reward()),
 			300,
