@@ -7,3 +7,11 @@
 ![Screencast From 2025-07-24 22-28-52](https://github.com/user-attachments/assets/faf109aa-920e-4f6d-a6aa-cc1df028663d)
 
 - after the training, use the model as enemy ai  
+
+
+
+plan
+- mapview
+- gameplay
+- simpler movement
+
